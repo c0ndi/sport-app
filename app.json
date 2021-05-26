@@ -1,0 +1,12 @@
+{
+  "name": "sport-app-v2",
+  "displayName": "sport-app-v2",
+  "expo": {
+    "name": "sport-app-v2",
+    "slug": "sport-app-v2",
+    "version": "1.0.0",
+    "assetBundlePatterns": [
+      "**/*"
+    ]
+  }
+}
