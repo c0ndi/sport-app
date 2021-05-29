@@ -1,21 +1,22 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import Parameters from './Parameters';
+import { Dimensions } from 'react-native';
+import styled from 'styled-components/native';
+import Hello from './Hello'
+const windowWidth = Dimensions.get('window').width;
+const windowHeight = Dimensions.get('window').height;
+
+const Container = styled.View`
+  height: ${windowHeight};
+  background: ${props => props.background};
+  width: ${windowWidth};
+`
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Siema</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Container background = '#23272A'>
+      <Hello />
+      <Parameters />
+    </Container>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
