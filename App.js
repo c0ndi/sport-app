@@ -7,11 +7,11 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const Container = styled.View`
-  height: ${windowHeight};
+  height: ${windowHeight*110};
   background: ${props => props.background};
   width: ${windowWidth};
 `
-
+// Wysokość zmieniona ze względu na notch'a
 export default function App() {
   return (
     <Container background = '#23272A'>

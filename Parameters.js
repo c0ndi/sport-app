@@ -21,7 +21,7 @@ const ParametersInfo = styled.View`
 const Container = styled.View`
   display: flex;
   align-items: center;
-  justify-content: space-evenly;
+  justify-content:space-evenly;
   flex-direction: column;
   width: 100%;
   border-radius: 10px;
@@ -42,10 +42,14 @@ const ParameterText = styled.Text`
   font-size: 20px;
   text-align: center;
 `
-
+const ButtonAdd = styled.Button`
+  width:50px;
+  height:50px;
+`
 function Parameter(props){
   return(
     <Container background = {props.background}>
+      <ButtonAdd title="+" onPress={props.changeWater}/>
       <TouchableOpacity>
         <DataText>{props.amount}</DataText>
         <ParameterText>{props.parameter}</ParameterText>
@@ -56,9 +60,12 @@ function Parameter(props){
 
 export default function Parameters() {
   const [waterAmount, setWater] = useState(12);
+  const changeWater = () => {
+    setWater(waterAmount+50);
+  };
   return(
     <ParametersInfo>
-      <Parameter parameter='ml' background = "#1976D2" amount = {waterAmount} />
+      <Parameter parameter='ml' background = "#1976D2" amount = {waterAmount} changeWater={changeWater}/>
       <Parameter parameter='steps' background = "#7B1FA2" amount = {<PedoCheck />} />
     </ParametersInfo>
   )
