@@ -7,7 +7,7 @@ const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 const Container = styled.View`
-  height: ${windowHeight*110};
+  height: ${windowHeight*1.1};
   background: ${props => props.background};
   width: ${windowWidth};
 `

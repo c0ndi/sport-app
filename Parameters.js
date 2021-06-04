@@ -4,6 +4,7 @@ import styled from 'styled-components/native';
 import PedoCheck from './Pedometers';
 import { TouchableOpacity } from 'react-native';
 import { Dimensions } from 'react-native';
+import Dialog from 'react-native-dialog';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -46,10 +47,64 @@ const ButtonAdd = styled.Button`
   width:50px;
   height:50px;
 `
+const ButtonContainer = styled.View`
+  position:absolute;
+  left:0;
+  top:0;
+  width:40px;
+`
+const WaterInput = styled.TextInput`
+  min-width: 100%;
+  margin-left:auto;
+  margin-right:auto;
+  font-size: 30px;
+  border-bottom-color: gray;
+  border-bottom-width: 1px;
+  text-align:center;
+  color: black;
+`
+function Button(props)
+{
+  const [visible, setVisible] = useState(false);
+  let number = 0;
+  const showDialog = () => {
+    setVisible(true);
+  };
+  const handleCancel = () => {
+    setVisible(false);
+    if(isNaN(number)){
+        number = number.replace(",", ".");
+    }
+    props.changeWater(number);
+  }
+  const handleInput = input => {
+      number = input;
+  }
+  return(
+    <>
+      <ButtonContainer>
+        <ButtonAdd title="+" onPress={showDialog}></ButtonAdd>
+      </ButtonContainer>
+      <Dialog.Container visible={visible}>
+        <Dialog.Title>Water</Dialog.Title>
+        <Dialog.Description>
+            Wprowadź ile wody wypiłeś: 
+        </Dialog.Description>
+        <WaterInput 
+          onChangeText = {handleInput} 
+          keyboardType='numeric'
+        />
+        <Dialog.Button label="Ok" onPress={handleCancel} />
+      </Dialog.Container>
+    </>
+  )
+}
 function Parameter(props){
+  let button;
+  if(props.changeWater!=null) button = <Button changeWater={props.changeWater}/>
   return(
     <Container background = {props.background}>
-      <ButtonAdd title="+" onPress={props.changeWater}/>
+        {button}
       <TouchableOpacity>
         <DataText>{props.amount}</DataText>
         <ParameterText>{props.parameter}</ParameterText>
@@ -59,9 +114,9 @@ function Parameter(props){
 }
 
 export default function Parameters() {
-  const [waterAmount, setWater] = useState(12);
-  const changeWater = () => {
-    setWater(waterAmount+50);
+  const [waterAmount, setWater] = useState(0);
+  const changeWater = (value) => {
+    setWater(Number(waterAmount)+Math.floor(value));
   };
   return(
     <ParametersInfo>
