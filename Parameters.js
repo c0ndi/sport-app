@@ -5,6 +5,7 @@ import PedoCheck from './Pedometers';
 import { TouchableOpacity } from 'react-native';
 import { Dimensions } from 'react-native';
 import Dialog from 'react-native-dialog';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const windowHeight = Dimensions.get('window').height;
 
@@ -114,9 +115,42 @@ function Parameter(props){
 }
 
 export default function Parameters() {
-  const [waterAmount, setWater] = useState(0);
+  const [waterAmount, setWater] = useState();
+  useEffect(()=>{
+    getWater();
+  })
+  const getWater = async() =>
+  {
+    const water = await AsyncStorage.getItem("water");
+    const lastUpdate = await AsyncStorage.getItem("lastUpdate");
+    const today = new Date().toDateString();
+    if(water==null)
+    {
+      setWater(0);
+    }
+    else
+    {
+      if(lastUpdate !== today)
+      {
+        await AsyncStorage.setItem("water","0");
+        await AsyncStorage.setItem("lastUpdate",today);
+        setWater(0);
+      }
+      else
+      {
+        setWater(water);
+      }
+    }//jak będziesz chciał wyczyścić AsyncStorage to zakomentuj wszystko wewnątrz funkcji getWater() i wpisz await AsyncStorage.clear()
+  }
+  const setData = async(parameter,value) =>
+  {
+    await AsyncStorage.setItem(parameter,value);
+    await AsyncStorage.setItem("lastUpdate",new Date().toDateString());
+  }
   const changeWater = (value) => {
-    setWater(Number(waterAmount)+Math.floor(value));
+    let water = Number(waterAmount)+Math.floor(value);
+    setData("water",String(water));
+    setWater(water);
   };
   return(
     <ParametersInfo>
