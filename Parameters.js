@@ -2,8 +2,7 @@ import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import PedoCheck from './Pedometers';
-import { TouchableOpacity } from 'react-native';
-import { Dimensions } from 'react-native';
+import { TouchableOpacity,Dimensions,Alert } from 'react-native';
 import Dialog from 'react-native-dialog';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -119,6 +118,18 @@ export default function Parameters() {
   useEffect(()=>{
     getWater();
   })
+  const yesterdayActivityAlert = (water) =>
+  {
+    Alert.alert(
+      "Tomorrow's activity report",
+      "Amount of water you have drunk: "+water,
+      [
+        {
+          text:"OK"
+        }
+      ]
+    )
+  }
   const getWater = async() =>
   {
     const water = await AsyncStorage.getItem("water");
@@ -132,6 +143,7 @@ export default function Parameters() {
     {
       if(lastUpdate !== today)
       {
+        yesterdayActivityAlert(water);
         await AsyncStorage.setItem("water","0");
         await AsyncStorage.setItem("lastUpdate",today);
         setWater(0);
@@ -145,7 +157,6 @@ export default function Parameters() {
   const setData = async(parameter,value) =>
   {
     await AsyncStorage.setItem(parameter,value);
-    await AsyncStorage.setItem("lastUpdate",new Date().toDateString());
   }
   const changeWater = (value) => {
     let water = Number(waterAmount)+Math.floor(value);
