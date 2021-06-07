@@ -135,17 +135,15 @@ export default function Parameters() {
     const water = await AsyncStorage.getItem("water");
     const lastUpdate = await AsyncStorage.getItem("lastUpdate");
     const today = new Date().toDateString();
-    if(water==null)
-    {
+    if(water == null) {
       await AsyncStorage.setItem("water","0");
       await AsyncStorage.setItem("lastUpdate",today);
       setWater(0);
     }
-    else
-    {
+    else {
       if(lastUpdate !== today)
       {
-        yesterdayActivityAlert(lastUpdate,water);
+        yesterdayActivityAlert(lastUpdate, water);
         await AsyncStorage.setItem("water","0");
         await AsyncStorage.setItem("lastUpdate",today);
         setWater(0);
@@ -161,8 +159,8 @@ export default function Parameters() {
     await AsyncStorage.setItem(parameter,value);
   }
   const changeWater = (value) => {
-    let water = Number(waterAmount)+Math.floor(value);
-    setData("water",String(water));
+    let water = Number(waterAmount) + Math.floor(value);
+    setData("water", String(water));
     setWater(water);
   };
   return(
@@ -172,3 +170,5 @@ export default function Parameters() {
     </ParametersInfo>
   )
 }
+
+
