@@ -118,11 +118,12 @@ export default function Parameters() {
   useEffect(()=>{
     getWater();
   })
-  const yesterdayActivityAlert = (lastUpdate,water) =>
+  const yesterdayActivityAlert = (lastUpdate,water,steps) =>
   {
     Alert.alert(
       lastUpdate+" activity report",
-      "Amount of water you have drunk: "+water,
+      "Water: "+water,
+      "Steps: "+steps,
       [
         {
           text:"OK"
@@ -133,6 +134,7 @@ export default function Parameters() {
   const getWater = async() =>
   {
     const water = await AsyncStorage.getItem("water");
+    const stepsCount = await AsyncStorage.getItem("stepsCount");
     const lastUpdate = await AsyncStorage.getItem("lastUpdate");
     const today = new Date().toDateString();
     if(water == null) {
@@ -143,8 +145,9 @@ export default function Parameters() {
     else {
       if(lastUpdate !== today)
       {
-        yesterdayActivityAlert(lastUpdate, water);
+        yesterdayActivityAlert(lastUpdate, water,stepsCount);
         await AsyncStorage.setItem("water","0");
+        await AsyncStorage.setItem("stepsCount","0");
         await AsyncStorage.setItem("lastUpdate",today);
         setWater(0);
       }
