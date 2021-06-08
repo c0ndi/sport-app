@@ -44,14 +44,12 @@ const ParameterText = styled.Text`
   text-align: center;
 `
 const ButtonAdd = styled.Button`
-  width:50px;
-  height:50px;
 `
 const ButtonContainer = styled.View`
   position:absolute;
   left:0;
   top:0;
-  width:40px;
+  width:75px;
 `
 const WaterInput = styled.TextInput`
   min-width: 100%;
@@ -122,8 +120,7 @@ export default function Parameters() {
   {
     Alert.alert(
       lastUpdate+" activity report",
-      "Water: "+water,
-      "Steps: "+steps,
+      `Water: ${water}\nSteps: ${steps}`,
       [
         {
           text:"OK"
