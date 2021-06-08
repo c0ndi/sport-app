@@ -118,8 +118,14 @@ export default function Parameters() {
   })
   const yesterdayActivityAlert = (lastUpdate,water,steps) =>
   {
+    let dateString = new Date(Date.parse(lastUpdate));
+    let day = dateString.getDate();
+    if(day<10) day = "0"+day;
+    let month = dateString.getMonth()+1;
+    if(month<10) month = "0"+month;
+    let year = dateString.getFullYear();
     Alert.alert(
-      lastUpdate+" activity report",
+      day+"."+month+"."+year+" activity report",
       `Water: ${water}\nSteps: ${steps}`,
       [
         {
