@@ -25,13 +25,12 @@ export default class PedoCheck extends React.Component {
     this.setState({currentStepCount:steps});
     this._subscribe();
   }
-  async componentDidUpdate() {
-    await this.setStepCount(this.state.currentStepCount);
-  }
   _subscribe = () => {
-    this._subscription = Pedometer.watchStepCount(result => {
+    this._subscription = Pedometer.watchStepCount(async (result) => {
+      const steps = Number(await AsyncStorage.getItem("stepsCount")); 
+      await this.setStepCount("stepsCount",result+steps);
       this.setState({
-        currentStepCount: result.steps,
+        currentStepCount: steps+result.steps,
       });
     });
 
