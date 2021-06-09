@@ -1,4 +1,5 @@
 import React from 'react';
+import {AppState} from 'react-native';
 import styled from 'styled-components/native';
 import { Pedometer } from 'expo-sensors';
 import AsyncStorage from '@react-native-async-storage/async-storage';

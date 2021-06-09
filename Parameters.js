@@ -2,7 +2,7 @@ import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
 import PedoCheck from './Pedometers';
-import { TouchableOpacity,Dimensions,Alert } from 'react-native';
+import { TouchableOpacity,Dimensions,Alert,AppState } from 'react-native';
 import Dialog from 'react-native-dialog';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -115,6 +115,23 @@ export default function Parameters() {
   const [waterAmount, setWater] = useState();
   useEffect(()=>{
     getWater();
+    AppState.addEventListener("change", checkDate = async () => {
+      const lastUpdate = await AsyncStorage.getItem("lastUpdate");
+      const today = new Date().toDateString();
+      if(lastUpdate !== today)
+      {
+        const water = await AsyncStorage.getItem("water");
+        const stepsCount = await AsyncStorage.getItem("stepsCount");
+        yesterdayActivityAlert(lastUpdate, water,stepsCount);
+        await AsyncStorage.setItem("water","0");
+        await AsyncStorage.setItem("stepsCount","0");
+        await AsyncStorage.setItem("lastUpdate",today);
+        setWater(0);
+      }
+    })
+    return () => {
+      AppState.removeEventListener("change",checkDate);
+    }
   })
   const yesterdayActivityAlert = (lastUpdate,water,steps) =>
   {
