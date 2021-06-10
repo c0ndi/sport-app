@@ -159,6 +159,7 @@ export default function Parameters() {
     const today = new Date().toDateString();
     if(water == null) {
       await AsyncStorage.setItem("water","0");
+      await AsyncStorage.setItem("stepsCount","0");
       await AsyncStorage.setItem("lastUpdate",today);
       setWater(0);
     }
