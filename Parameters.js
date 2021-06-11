@@ -14,7 +14,7 @@ const ParametersInfo = styled.View`
   align-items: center;
   flex-direction: column;
   width: 90%;
-  height: ${windowHeight}px;
+  height: ${windowHeight};
   margin-left: auto;
   margin-right: auto;
 ` 
