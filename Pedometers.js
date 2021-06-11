@@ -1,5 +1,6 @@
 import React from 'react';
 import styled from 'styled-components/native';
+import { AppState } from 'react-native';
 import { Pedometer } from 'expo-sensors';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -18,9 +19,27 @@ export default class PedoCheck extends React.Component {
     await AsyncStorage.setItem('stepsCount', String(steps));
   }
   async componentDidMount() {
-    const steps = Number(await AsyncStorage.getItem("stepsCount"));
-    this.setState({currentStepCount:steps});
+    const checkDate = async () =>
+    {
+      const lastUpdate = await AsyncStorage.getItem("lastUpdate");
+      const today = new Date().toDateString();
+      if(lastUpdate !== today)
+      {
+        this.setState({currentStepCount:0});
+        await AsyncStorage.setItem("stepsCount","0");
+      }
+      else
+      {
+        const steps = Number(await AsyncStorage.getItem("stepsCount"));
+        this.setState({currentStepCount:steps});
+      }
+    }
+    await checkDate();
+    AppState.addEventListener("change", checkDate);
     this._subscribe();
+    return () => {
+      AppState.removeEventListener("change",checkDate);
+    }
   }
   async componentDidUpdate(){
     await AsyncStorage.setItem("stepsCount",String(this.state.currentStepCount));
