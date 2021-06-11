@@ -12,54 +12,34 @@ const Steps = styled.Text`
 
 export default class PedoCheck extends React.Component {
   state = {
-    isPedometerAvailable: 'checking',
-    pastStepCount: 0,
-    currentStepCount: 0,
+    currentStepCount: '',
   };
 
   setStepCount = async(steps) => {
     await AsyncStorage.setItem('stepsCount', String(steps));
   }
   async componentDidMount() {
-    let steps = Number(await AsyncStorage.getItem('stepsCount'));
+    const steps = Number(await AsyncStorage.getItem("stepsCount"));
     this.setState({currentStepCount:steps});
     this._subscribe();
   }
-  _subscribe = () => {
-    this._subscription = Pedometer.watchStepCount(async (result) => {
-      const steps = Number(await AsyncStorage.getItem("stepsCount")); 
-      await this.setStepCount("stepsCount",Number(result)+steps);
+  async componentDidUpdate(){
+    await AsyncStorage.setItem("stepsCount",String(this.state.currentStepCount));
+  }
+  componentWillUnmount() {
+    this._unsubscribe();
+  }
+  _subscribe = async () => {
+    const steps = Number(await AsyncStorage.getItem("stepsCount")); 
+    this._subscription = Pedometer.watchStepCount((result) => {
       this.setState({
-        currentStepCount: await AsyncStorage.getItem("stepsCount"),
+        currentStepCount: (steps+result.steps),
       });
     });
-
-    Pedometer.isAvailableAsync().then(
-      result => {
-        this.setState({
-          isPedometerAvailable: String(result),
-        });
-      },
-      error => {
-        this.setState({
-          isPedometerAvailable: 'Could not get isPedometerAvailable: ' + error,
-        });
-      }
-    );
-
-    const end = new Date();
-    const start = new Date();
-    start.setDate(end.getDate() - 1);
-    Pedometer.getStepCountAsync(start, end).then(
-      result => {
-        this.setState({ pastStepCount: result.steps });
-      },
-      error => {
-        this.setState({
-          pastStepCount: 'Could not get stepCount: ' + error,
-        });
-      }
-    );
+  };
+  _unsubscribe = () => {
+    this._subscription && this._subscription.remove();
+    this._subscription = null;
   };
 
   render() {

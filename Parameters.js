@@ -115,22 +115,9 @@ export default function Parameters() {
   const [waterAmount, setWater] = useState();
   useEffect(()=>{
     getWater();
-    AppState.addEventListener("change", checkDate = async () => {
-      const lastUpdate = await AsyncStorage.getItem("lastUpdate");
-      const today = new Date().toDateString();
-      if(lastUpdate !== today)
-      {
-        const water = await AsyncStorage.getItem("water");
-        const stepsCount = await AsyncStorage.getItem("stepsCount");
-        yesterdayActivityAlert(lastUpdate, water,stepsCount);
-        await AsyncStorage.setItem("water","0");
-        await AsyncStorage.setItem("stepsCount","0");
-        await AsyncStorage.setItem("lastUpdate",today);
-        setWater(0);
-      }
-    })
+    AppState.addEventListener("change", getWater)
     return () => {
-      AppState.removeEventListener("change",checkDate);
+      AppState.removeEventListener("change",getWater);
     }
   })
   const yesterdayActivityAlert = (lastUpdate,water,steps) =>
