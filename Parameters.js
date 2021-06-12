@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import PedoCheck from './Pedometers';
 import { TouchableOpacity,Dimensions,Alert,AppState } from 'react-native';
+import { Pedometer } from 'expo-sensors';
 import Dialog from 'react-native-dialog';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -113,13 +113,9 @@ function Parameter(props){
 
 export default function Parameters() {
   const [waterAmount, setWater] = useState();
-  useEffect(()=>{
-    getWater();
-    AppState.addEventListener("change", getWater)
-    return () => {
-      AppState.removeEventListener("change",getWater);
-    }
-  })
+  const [stepsCount, setSteps] = useState();
+  let _subscription;
+  let firstStepsCount;
   const yesterdayActivityAlert = (lastUpdate,water,steps) =>
   {
     let dateString = new Date(Date.parse(lastUpdate));
@@ -138,32 +134,42 @@ export default function Parameters() {
       ]
     )
   }
-  const getWater = async() =>
+  const getValues = async() =>
   {
     const water = await AsyncStorage.getItem("water");
     const stepsCount = await AsyncStorage.getItem("stepsCount");
     const lastUpdate = await AsyncStorage.getItem("lastUpdate");
     const today = new Date().toDateString();
-    if(water == null) {
+    if(water == null || isNaN(stepsCount)) {
       await AsyncStorage.setItem("water","0");
       await AsyncStorage.setItem("stepsCount","0");
       await AsyncStorage.setItem("lastUpdate",today);
       setWater(0);
+      setSteps(0);
     }
     else {
       if(lastUpdate !== today)
       {
         yesterdayActivityAlert(lastUpdate, water,stepsCount);
+        _subscription.remove();
+        _subscription = null;
+        firstStepsCount = 0;
         await AsyncStorage.setItem("water","0");
         await AsyncStorage.setItem("stepsCount","0");
         await AsyncStorage.setItem("lastUpdate",today);
         setWater(0);
+        setSteps(0);
+        _subscription = Pedometer.watchStepCount(async (result) => {
+          setSteps(firstStepsCount+result.steps);
+          await AsyncStorage.setItem("stepsCount",String(firstStepsCount+result.steps));
+        });
       }
       else
       {
         setWater(water);
+        setSteps(stepsCount);
       }
-    }//jak będziesz chciał wyczyścić AsyncStorage to zakomentuj wszystko wewnątrz funkcji getWater() i wpisz await AsyncStorage.clear()
+    }
   }
   const setData = async(parameter,value) =>
   {
@@ -174,10 +180,32 @@ export default function Parameters() {
     setData("water", String(water));
     setWater(water);
   };
+  _subscribe = async () => {
+    firstStepsCount = Number(await AsyncStorage.getItem("stepsCount"));
+    _subscription = Pedometer.watchStepCount(async (result) => {
+      setSteps(firstStepsCount+result.steps);
+      await AsyncStorage.setItem("stepsCount",String(firstStepsCount+result.steps));
+    });
+  };
+  _unsubscribe = () => {
+    _subscription && _subscription.remove();
+    _subscription = null;
+  };
+  useEffect(()=>{
+    getValues();
+    AppState.addEventListener("change", checkDate = async () => {
+      await getValues();
+    });
+    _subscribe();
+    return () => {
+      AppState.removeEventListener("change",checkDate);
+      _unsubscribe();
+    }
+  },[]);
   return(
     <ParametersInfo>
       <Parameter parameter='ml' background = "#1976D2" amount = {waterAmount} changeWater={changeWater}/>
-      <Parameter parameter='steps' background = "#7B1FA2" amount = {<PedoCheck />} />
+      <Parameter parameter='steps' background = "#7B1FA2" amount = {stepsCount} />
     </ParametersInfo>
   )
 }
