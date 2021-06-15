@@ -1,14 +1,15 @@
 import 'react-native-gesture-handler';
 import React, {useState, useEffect} from 'react';
 import styled from 'styled-components/native';
-import { TouchableOpacity,Dimensions,Alert,AppState } from 'react-native';
+import { TouchableOpacity,Dimensions,Alert,AppState,Animated } from 'react-native';
 import { Pedometer } from 'expo-sensors';
 import Dialog from 'react-native-dialog';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Easing } from 'react-native-reanimated';
 
 const windowHeight = Dimensions.get('window').height;
 
-const ParametersInfo = styled.View`
+const ParametersInfo = styled(Animated.View)`
   margin-top: 7%;
   display: flex;
   align-items: center;
@@ -191,19 +192,26 @@ export default function Parameters() {
     _subscription && _subscription.remove();
     _subscription = null;
   };
+  const opacity = new Animated.Value(0);
   useEffect(()=>{
     getValues();
     AppState.addEventListener("change", checkDate = async () => {
       await getValues();
     });
     _subscribe();
+    Animated.timing(opacity, {
+      toValue: 1,
+      duration: 1000,
+      easing: Easing.ease,
+      useNativeDriver: true
+    }).start();
     return () => {
       AppState.removeEventListener("change",checkDate);
       _unsubscribe();
     }
   },[]);
   return(
-    <ParametersInfo>
+    <ParametersInfo style={{opacity}}>
       <Parameter parameter='ml' background = "#1976D2" amount = {waterAmount} changeWater={changeWater}/>
       <Parameter parameter='steps' background = "#7B1FA2" amount = {stepsCount} />
     </ParametersInfo>
